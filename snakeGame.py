@@ -14,6 +14,27 @@ counter = 0
 black = 0,0,0
 # AUDIO
 hitSound = pygame.mixer.Sound("doorHit.mp3")
+snakeList = []
+snakeLength = 1
+gameover = pygame.image.load("gameOver.jpg")
+gameover = pygame.transform.scale(gameover,(W,H))
+def drawSnake(snakeList):
+    for i in snakeList:
+        pygame.draw.rect(screen,red,[i[0],i[1],w,h])
+        
+
+def GameOver():
+    while True:
+        screen.fill(white)
+        for event in pygame.event.get():
+            if event.type==pygame.QUIT:
+                pygame.quit()
+                quit()
+
+        screen.blit(gameover,(0,0))
+        pygame.display.flip()
+
+
 def Score(counter):
     # font define - size , type
     font = pygame.font.SysFont(None,30)
@@ -21,6 +42,9 @@ def Score(counter):
     text =  font.render(f"Score : {counter}",True,black)
     # blit - print
     screen.blit(text,(10,10))
+
+
+
 while True:
     screen.fill(white)
     for event in pygame.event.get():
@@ -41,6 +65,16 @@ while True:
                 move_y=0
                 move_x=0.5
     snake = pygame.draw.rect(screen,red,[x,y,w,h])
+    snakeList.append([x,y])
+
+    if snakeLength<len(snakeList):
+        snakeList.pop(0)
+
+
+    if snakeList[-1] in snakeList[:-1]:
+        GameOver()
+
+    drawSnake(snakeList)
     enemy = pygame.draw.rect(screen,green,[en_x,en_y,en_w,en_h])
     x+=move_x
     y+=move_y
@@ -50,15 +84,15 @@ while True:
         en_y = random.randint(0,H-en_h)
         counter+=1
         hitSound.play()
+        snakeLength+=30
 
     if x<0:
         x = W-w
     elif x>W-w:
         x=0
-
     elif y<0:
         y = H-h
     elif y>H-h:
         y=0
-        
-    pygame.display.update()
+
+    pygame.display.flip()
